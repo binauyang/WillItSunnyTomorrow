@@ -12,37 +12,16 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
-
-import com.baidu.location.BDLocation;
-import com.baidu.location.BDLocationListener;
-import com.baidu.location.LocationClient;
+import android.widget.Toast;
 
 import cn.edu.tju.willitsunnytomorrow.R;
-import cn.edu.tju.willitsunnytomorrow.util.LogUtil;
+import cn.edu.tju.willitsunnytomorrow.util.LocationUtil;
 import in.srain.cube.views.ptr.PtrClassicFrameLayout;
 import in.srain.cube.views.ptr.PtrDefaultHandler;
 import in.srain.cube.views.ptr.PtrFrameLayout;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
-
-    private LocationClient mLocationClient = null;
-    private BDLocationListener mLocationListener = new BDLocationListener() {
-        @Override
-        public void onReceiveLocation(BDLocation location) {
-            StringBuffer sb = new StringBuffer(256);
-            sb.append("time:");
-            sb.append(location.getTime());
-            sb.append("\nerror code:");
-            sb.append(location.getLocType());
-            sb.append(location.getLatitude());
-            sb.append("\nlontitude : ");
-            sb.append(location.getLongitude());
-            sb.append("\nradius : ");
-            sb.append(location.getRadius());
-            LogUtil.logv("BaiduLocationApiDem", sb.toString());
-        }
-    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -148,7 +127,11 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void initLocation() {
-        mLocationClient = new LocationClient(getApplicationContext());
-        mLocationClient.registerLocationListener(mLocationListener);
+        LocationUtil.requestLocation(this, new LocationUtil.LocationRequestListener() {
+            @Override
+            public void postLocation(String location) {
+                Toast.makeText(MainActivity.this.getApplicationContext(), "location:" + location, Toast.LENGTH_LONG).show();
+            }
+        });
     }
 }
