@@ -1,99 +1,125 @@
 package cn.edu.tju.willitsunnytomorrow.util;
 
 import android.content.Context;
-import android.location.Address;
-import android.location.Geocoder;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
-import android.os.AsyncTask;
-import android.os.Bundle;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Locale;
+import com.baidu.location.BDLocation;
+import com.baidu.location.BDLocationListener;
+import com.baidu.location.LocationClient;
+import com.baidu.location.LocationClientOption;
 
 /**
  * Created by N550 on 2016/3/6.
  */
 public class LocationUtil {
 
-    private static Context mContext;
+    private Context mContext;
 
-    private static LocationRequestListener mLocationRequestListener;
+    private LocationRequestListener mLocationRequestListener;
 
     public interface LocationRequestListener {
         public void postLocation(String location);
     }
 
-    private static LocationListener mLocationListener = new LocationListener() {
-        @Override
-        public void onLocationChanged(Location location) {
-            final Location l = location;
-            if (null != location) {
-                final StringBuilder addrSb = new StringBuilder();
-                final Geocoder gc = new Geocoder(mContext, Locale.getDefault());
-                new AsyncTask<Void, Void, Object>() {
-                    @Override
-                    protected Object doInBackground(Void... voids) {
-                        try {
-                            return gc.getFromLocation(l.getLatitude(), l.getLongitude(), 1);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                            return null;
-                        }
-                    }
+    private LocationClient mLocationClient = null;
 
-                    @Override
-                    protected void onPostExecute(Object result) {
-                        List<Address> addressList = (List<Address>) result;
-                        if (null == addressList) {
-                            addrSb.append("no address available");
-                            mLocationRequestListener.postLocation(addrSb.toString());
-                            return;
-                        }
-                        if (addressList.size() > 0) {
-                            Address address = addressList.get(0);
-                            int addrMaxLine = address.getMaxAddressLineIndex();
-                            for (int i = 0; i< addrMaxLine; ++i) {
-                                addrSb.append(address.getAddressLine(i) + ",");
-                            }
-                            LocationManager lmgr = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
-                            lmgr.removeUpdates(mLocationListener);
-                            mLocationRequestListener.postLocation(addrSb.toString());
-                        }
+    private static LocationUtil sLocationUtil = null;
 
-                        super.onPostExecute(result);
-                    }
-                }.execute();
-            }
+    private LocationUtil() {
+
+    }
+
+    public static LocationUtil getInstance() {
+        if (null == sLocationUtil) {
+            return new LocationUtil();
+        } else {
+            return sLocationUtil;
         }
+    }
 
+    public BDLocationListener mBDLocationListener = new BDLocationListener() {
         @Override
-        public void onStatusChanged(String s, int i, Bundle bundle) {
-
-        }
-
-        @Override
-        public void onProviderEnabled(String s) {
-
-        }
-
-        @Override
-        public void onProviderDisabled(String s) {
-
+        public void onReceiveLocation(BDLocation location) {
+            //Receive Location
+            LogUtil.loge("return code:" + location.getLocType());
+            LogUtil.logv("city:" + location.getCity());
+            StringBuffer sb = new StringBuffer(256);
+            sb.append("time : ");
+            sb.append(location.getTime());
+            sb.append("\nerror code : ");
+            sb.append(location.getLocType());
+            sb.append("\nlatitude : ");
+            sb.append(location.getLatitude());
+            sb.append("\nlontitude : ");
+            sb.append(location.getLongitude());
+            sb.append("\nradius : ");
+            sb.append(location.getRadius());
+            LogUtil.logv("info:" + sb.toString());
+//            if (location.getLocType() == BDLocation.TypeGpsLocation) {// GPS定位结果
+//                sb.append("\nspeed : ");
+//                sb.append(location.getSpeed());// 单位：公里每小时
+//                sb.append("\nsatellite : ");
+//                sb.append(location.getSatelliteNumber());
+//                sb.append("\nheight : ");
+//                sb.append(location.getAltitude());// 单位：米
+//                sb.append("\ndirection : ");
+//                sb.append(location.getDirection());// 单位度
+//                sb.append("\naddr : ");
+//                sb.append(location.getAddrStr());
+//                sb.append("\ndescribe : ");
+//                sb.append("gps定位成功");
+//
+//            } else if (location.getLocType() == BDLocation.TypeNetWorkLocation) {// 网络定位结果
+//                sb.append("\naddr : ");
+//                sb.append(location.getAddrStr());
+//                //运营商信息
+//                sb.append("\noperationers : ");
+//                sb.append(location.getOperators());
+//                sb.append("\ndescribe : ");
+//                sb.append("网络定位成功");
+//            } else if (location.getLocType() == BDLocation.TypeOffLineLocation) {// 离线定位结果
+//                sb.append("\ndescribe : ");
+//                sb.append("离线定位成功，离线定位结果也是有效的");
+//            } else if (location.getLocType() == BDLocation.TypeServerError) {
+//                sb.append("\ndescribe : ");
+//                sb.append("服务端网络定位失败，可以反馈IMEI号和大体定位时间到loc-bugs@baidu.com，会有人追查原因");
+//            } else if (location.getLocType() == BDLocation.TypeNetWorkException) {
+//                sb.append("\ndescribe : ");
+//                sb.append("网络不同导致定位失败，请检查网络是否通畅");
+//            } else if (location.getLocType() == BDLocation.TypeCriteriaException) {
+//                sb.append("\ndescribe : ");
+//                sb.append("无法获取有效定位依据导致定位失败，一般是由于手机的原因，处于飞行模式下一般会造成这种结果，可以试着重启手机");
+//            }
+//            sb.append("\nlocationdescribe : ");
+//            sb.append(location.getLocationDescribe());// 位置语义化信息
+//            LogUtil.logv("BaiduLocationApiDem", sb.toString());
         }
     };
 
-    public static void requestLocation(Context context, LocationRequestListener l) {
+    public void requestLocation(Context context, LocationRequestListener l) {
         mContext = context;
-        LocationManager lmgr = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
-        if (!lmgr.isProviderEnabled(LocationManager.GPS_PROVIDER) && !lmgr.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
-            l.postLocation("no address available");
-            return;
-        }
         mLocationRequestListener = l;
-        lmgr.requestLocationUpdates(LocationManager.GPS_PROVIDER, 6000, 0, mLocationListener);
-        lmgr.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 6000, 0, mLocationListener);
+        mLocationClient = new LocationClient(context);
+        mLocationClient.registerLocationListener(mBDLocationListener);    //注册监听函数
+        initOptions();
+        mLocationClient.start();
+    }
+
+    private void initOptions() {
+        LocationClientOption option = new LocationClientOption();
+        option.setLocationMode(LocationClientOption.LocationMode.Hight_Accuracy
+        );//可选，默认高精度，设置定位模式，高精度，低功耗，仅设备
+        option.setCoorType("bd09ll");//可选，默认gcj02，设置返回的定位结果坐标系
+        int span=0;
+        option.setScanSpan(span);//可选，默认0，即仅定位一次，设置发起定位请求的间隔需要大于等于1000ms才是有效的
+        option.setIsNeedAddress(true);//可选，设置是否需要地址信息，默认不需要
+        option.setOpenGps(true);//可选，默认false,设置是否使用gps
+        option.setLocationNotify(true);//可选，默认false，设置是否当gps有效时按照1S1次频率输出GPS结果
+        option.setIsNeedLocationDescribe(true);//可选，默认false，设置是否需要位置语义化结果，可以在BDLocation.getLocationDescribe里得到，结果类似于“在北京天安门附近”
+        option.setIsNeedLocationPoiList(true);//可选，默认false，设置是否需要POI结果，可以在BDLocation.getPoiList里得到
+        option.setIgnoreKillProcess(false);//可选，默认true，定位SDK内部是一个SERVICE，并放到了独立进程，设置是否在stop的时候杀死这个进程，默认不杀死
+        option.SetIgnoreCacheException(false);//可选，默认false，设置是否收集CRASH信息，默认收集
+        option.setEnableSimulateGps(false);//可选，默认false，设置是否需要过滤gps仿真结果，默认需要
+
+        mLocationClient.setLocOption(option);
     }
 }

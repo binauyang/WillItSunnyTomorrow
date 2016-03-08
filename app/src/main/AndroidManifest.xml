@@ -38,12 +38,13 @@
             </intent-filter>
         </activity>
 
-        <!--<service android:name="com.baidu.location.f" android:enabled="true" android:process=":remote"></service>
+        <service android:name="com.baidu.location.f" android:enabled="true" android:process=":remote">
+        </service>
+
         <meta-data
             android:name="com.baidu.lbsapi.API_KEY"
-            android:value="b7wK53L325XyWrjLUHBcfE0N">
+            android:value="b7wK53L325XyWrjLUHBcfE0N" />
 
-        </meta-data>-->
     </application>
 
 </manifest>

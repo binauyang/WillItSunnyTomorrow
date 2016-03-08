@@ -17,4 +17,8 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
+    <style name="Wist.ToolBar.Text" parent="TextAppearance.AppCompat.Widget.ActionBar.Title">
+        <item name="android:textSize">20dp</item>
+    </style>
+
 </resources>
