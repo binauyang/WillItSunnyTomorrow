@@ -16,11 +16,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import cn.edu.tju.willitsunnytomorrow.R;
+import cn.edu.tju.willitsunnytomorrow.util.LocalDisplay;
 import cn.edu.tju.willitsunnytomorrow.util.LocationUtil;
 import cn.edu.tju.willitsunnytomorrow.util.TimeUtil;
 import in.srain.cube.views.ptr.PtrClassicFrameLayout;
 import in.srain.cube.views.ptr.PtrDefaultHandler;
 import in.srain.cube.views.ptr.PtrFrameLayout;
+import in.srain.cube.views.ptr.header.MaterialHeader;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -113,14 +115,14 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view_left);
         navigationView.setNavigationItemSelectedListener(this);
 
-        final PtrClassicFrameLayout ptrFrame = (PtrClassicFrameLayout) findViewById(R.id.ptr_fragment_layout);
-        ptrFrame.setPtrHandler(new PtrDefaultHandler() {
+        final PtrClassicFrameLayout ptrFrameLayout = (PtrClassicFrameLayout) findViewById(R.id.ptr_fragment_layout);
+        ptrFrameLayout.setPtrHandler(new PtrDefaultHandler() {
             @Override
             public void onRefreshBegin(PtrFrameLayout frame) {
                 frame.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        ptrFrame.refreshComplete();
+                        ptrFrameLayout.refreshComplete();
                     }
                 }, 1500);
             }
@@ -130,7 +132,18 @@ public class MainActivity extends AppCompatActivity
                 return true;
             }
         });
-        ptrFrame.setBackgroundColor(ContextCompat.getColor(this, android.R.color.holo_blue_light));
+        ptrFrameLayout.setBackgroundColor(ContextCompat.getColor(this, android.R.color.holo_blue_light));
+        // header
+        final MaterialHeader header = new MaterialHeader(this);
+        int[] colors = getResources().getIntArray(R.array.google_colors);
+        header.setColorSchemeColors(colors);
+        header.setLayoutParams(new PtrFrameLayout.LayoutParams(-1, -2));
+        header.setPadding(0, LocalDisplay.dp2px(15), 0, LocalDisplay.dp2px(10));
+        header.setPtrFrameLayout(ptrFrameLayout);
+        ptrFrameLayout.setHeaderView(header);
+        ptrFrameLayout.addPtrUIHandler(header);
+        ptrFrameLayout.setLoadingMinTime(1000);
+        ptrFrameLayout.setDurationToCloseHeader(1500);
 
         mDateTextView = (TextView) findViewById(R.id.tv_date);
         mLocationTextView = (TextView) findViewById(R.id.tv_location);

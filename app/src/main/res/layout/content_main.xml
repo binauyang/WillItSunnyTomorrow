@@ -8,12 +8,11 @@
     tools:context=".ui.activity.MainActivity"
     tools:showIn="@layout/app_bar_main">
 
-    <in.srain.cube.views.ptr.PtrClassicFrameLayout
+    <in.srain.cube.views.ptr.PtrClassicFrameLayout xmlns:cube_ptr="http://schemas.android.com/apk/res-auto"
         android:id="@+id/ptr_fragment_layout"
-        xmlns:cube_ptr="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#fff"
+        android:background="@android:color/holo_blue_light"
         cube_ptr:ptr_duration_to_close="200"
         cube_ptr:ptr_duration_to_close_header="1000"
         cube_ptr:ptr_keep_header_when_refresh="true"
@@ -21,7 +20,7 @@
         cube_ptr:ptr_ratio_of_header_height_to_refresh="1.2"
         cube_ptr:ptr_resistance="1.7">
 
-        <TextView
+        <!--<TextView
             android:id="@+id/fragment_rotate_header_with_text_view_content"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -29,7 +28,34 @@
             android:gravity="center"
             android:text="I am a TextView"
             android:background="@android:color/holo_blue_light"
-            android:textSize="30sp" />
+            android:textSize="30sp" />-->
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/holo_blue_light">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <ImageView
+                    android:id="@+id/iv_detail_weather_info"
+                    android:layout_width="169dp"
+                    android:layout_height="169dp"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="130dp"
+                    android:adjustViewBounds="true"
+                    android:src="@mipmap/qjdy_normal" />
+
+                <ImageView
+                    android:id="@+id/iv_weather_info"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    />
+            </RelativeLayout>
+
+        </ScrollView>
+
 
     </in.srain.cube.views.ptr.PtrClassicFrameLayout>
 
